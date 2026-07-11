@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="el">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>Μετρήσεις pre-TEKMON</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div>
+      <p class="eyebrow">Ημερολόγιο παραγωγής</p>
+      <h1>Μετρήσεις pre-TEKMON</h1>
+    </div>
+    <button id="themeBtn" class="icon-btn" type="button" title="Αλλαγή θέματος" aria-label="Αλλαγή θέματος">◐</button>
+  </header>
+
+  <main class="container">
+    <section class="card date-card">
+      <div class="date-grid">
+        <label>Ημερομηνία
+          <input id="entryDate" type="date" />
+        </label>
+        <label>Ώρα
+          <input id="entryTime" type="time" />
+        </label>
+        <label>Υπεύθυνος / Βάρδια
+          <input id="operator" type="text" placeholder="Προαιρετικό" />
+        </label>
+      </div>
+    </section>
+
+    <nav class="tabs" aria-label="Κύρια πλοήγηση">
+      <button class="tab active" data-view="formView" type="button">Καταχώρηση</button>
+      <button class="tab" data-view="historyView" type="button">Ιστορικό <span id="historyCount" class="badge">0</span></button>
+    </nav>
+
+    <section id="formView" class="view active">
+      <form id="measurementsForm" autocomplete="off">
+        <section class="card custom-section-tools">
+          <div>
+            <h2>Διαχείριση τομέων</h2>
+            <p>Πρόσθεσε δικό σου τομέα και τις μετρήσεις που θέλεις να συμπληρώνεις.</p>
+          </div>
+          <button id="showAddSectionBtn" class="btn secondary" type="button">+ Νέος τομέας</button>
+          <div id="addSectionPanel" class="add-section-panel" hidden>
+            <label>Όνομα τομέα
+              <input id="newSectionName" type="text" placeholder="π.χ. Αεροσυμπιεστές" />
+            </label>
+            <label>Ονομασίες μετρήσεων
+              <textarea id="newSectionFields" rows="4" placeholder="Μία μέτρηση ανά γραμμή, π.χ.&#10;Πίεση&#10;Θερμοκρασία&#10;Ώρες λειτουργίας"></textarea>
+            </label>
+            <div class="panel-actions">
+              <button id="cancelAddSectionBtn" class="btn secondary" type="button">Άκυρο</button>
+              <button id="addSectionBtn" class="btn primary" type="button">Προσθήκη τομέα</button>
+            </div>
+          </div>
+        </section>
+
+        <div id="sectionsRoot"></div>
+
+        <section class="card notes-card">
+          <h2>Σημειώσεις</h2>
+          <textarea id="notes" rows="5" placeholder="Παρατηρήσεις, βλάβες, ενέργειες..."></textarea>
+        </section>
+
+        <div class="sticky-actions">
+          <button id="clearBtn" class="btn secondary" type="button">Καθαρισμός</button>
+          <button id="saveBtn" class="btn primary" type="submit">Αποθήκευση</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="historyView" class="view">
+      <section class="card history-tools">
+        <input id="historySearch" type="search" placeholder="Αναζήτηση ημερομηνίας, ώρας ή σημείωσης..." />
+        <div class="tool-row">
+          <button id="exportJsonBtn" class="btn secondary" type="button">Εξαγωγή JSON</button>
+          <button id="exportCsvBtn" class="btn secondary" type="button">Εξαγωγή CSV</button>
+          <label class="btn secondary file-label">Εισαγωγή JSON
+            <input id="importJsonInput" type="file" accept="application/json" hidden />
+          </label>
+          <button id="deleteAllBtn" class="btn danger" type="button">Διαγραφή όλων</button>
+        </div>
+      </section>
+      <div id="historyList" class="history-list"></div>
+      <p id="emptyHistory" class="empty-state">Δεν υπάρχουν αποθηκευμένες καταχωρήσεις.</p>
+    </section>
+  </main>
+
+  <template id="historyItemTemplate">
+    <article class="card history-item">
+      <div class="history-head">
+        <div>
+          <h3 class="history-title"></h3>
+          <p class="history-subtitle"></p>
+        </div>
+        <div class="history-actions">
+          <button class="small-btn load-entry" type="button">Άνοιγμα</button>
+          <button class="small-btn print-entry" type="button">Εκτύπωση</button>
+          <button class="small-btn danger delete-entry" type="button">Διαγραφή</button>
+        </div>
+      </div>
+      <details>
+        <summary>Προβολή μετρήσεων</summary>
+        <div class="history-details"></div>
+      </details>
+    </article>
+  </template>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>
