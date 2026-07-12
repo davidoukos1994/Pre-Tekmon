@@ -39,26 +39,6 @@
 
     <section id="formView" class="view active">
       <form id="measurementsForm" autocomplete="off">
-        <section class="card custom-section-tools">
-          <div>
-            <h2>Διαχείριση τομέων</h2>
-            <p>Πρόσθεσε δικό σου τομέα και τις μετρήσεις που θέλεις να συμπληρώνεις.</p>
-          </div>
-          <button id="showAddSectionBtn" class="btn secondary" type="button">+ Νέος τομέας</button>
-          <div id="addSectionPanel" class="add-section-panel" hidden>
-            <label>Όνομα τομέα
-              <input id="newSectionName" type="text" placeholder="π.χ. Αεροσυμπιεστές" />
-            </label>
-            <label>Ονομασίες μετρήσεων
-              <textarea id="newSectionFields" rows="4" placeholder="Μία μέτρηση ανά γραμμή, π.χ.&#10;Πίεση&#10;Θερμοκρασία&#10;Ώρες λειτουργίας"></textarea>
-            </label>
-            <div class="panel-actions">
-              <button id="cancelAddSectionBtn" class="btn secondary" type="button">Άκυρο</button>
-              <button id="addSectionBtn" class="btn primary" type="button">Προσθήκη τομέα</button>
-            </div>
-          </div>
-        </section>
-
         <div id="sectionsRoot"></div>
 
         <section class="card notes-card">

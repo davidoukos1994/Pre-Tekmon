@@ -1,8 +1,7 @@
 const STORAGE_KEY = 'preTekmonMeasurementsV1';
 const THEME_KEY = 'preTekmonTheme';
-const CUSTOM_SECTIONS_KEY = 'preTekmonCustomSectionsV1';
 
-const baseSections = [
+const sections = [
   {
     title: 'Γενικές μετρήσεις',
     groups: [
@@ -33,8 +32,8 @@ const baseSections = [
   {
     title: 'Ψυκτικές μετρήσεις',
     groups: [
-      { title: 'Ψυκτικό Β', fields: ['Ψυκτικό Α', 'Πίεση αντλίας', 'Διαφορική πίεση', 'Διαφορική γλυκόλης', 'Νερού θερμοκρασία (είσοδος/έξοδος)', 'Γλυκόλη θερμοκρασία (είσοδος/έξοδος)', 'Ψυκτικό μικρή/μεγάλη 1', 'Ψυκτικό μικρή/μεγάλη 2'] },
-      { title: 'Ψυκτικό Α', fields: ['Ψυκτικό Β', 'Πίεση αντλίας', 'Διαφορική πίεση', 'Διαφορική γλυκόλης', 'Νερού θερμοκρασία (είσοδος/έξοδος)', 'Γλυκόλη θερμοκρασία (είσοδος/έξοδος)', 'Ψυκτικό μικρή/μεγάλη 1', 'Ψυκτικό μικρή/μεγάλη 2'] },
+      { title: 'Ψυκτικό Β', fields: ['Ψυκτικό Β', 'Πίεση αντλίας', 'Διαφορική πίεση', 'Διαφορική γλυκόλης', 'Νερού θερμοκρασία (είσοδος/έξοδος)', 'Γλυκόλη θερμοκρασία (είσοδος/έξοδος)', 'Ψυκτικό μικρή/μεγάλη 1', 'Ψυκτικό μικρή/μεγάλη 2'] },
+      { title: 'Ψυκτικό Α', fields: ['Ψυκτικό Α', 'Πίεση αντλίας', 'Διαφορική πίεση', 'Διαφορική γλυκόλης', 'Νερού θερμοκρασία (είσοδος/έξοδος)', 'Γλυκόλη θερμοκρασία (είσοδος/έξοδος)', 'Ψυκτικό μικρή/μεγάλη 1', 'Ψυκτικό μικρή/μεγάλη 2'] },
       { title: 'Ψυκτικό C', fields: ['Ψυκτικό C', 'Capacity', 'Πίεση αντλίας', 'Διαφορική πίεση', 'Διαφορική γλυκόλης', 'Νερού θερμοκρασία (είσοδος/έξοδος)', 'Γλυκόλη θερμοκρασία (είσοδος/έξοδος)', 'Ψυκτικό μικρή/μεγάλη'] }
     ]
   },
@@ -58,26 +57,6 @@ const baseSections = [
   }
 ];
 
-
-function getCustomSections() {
-  try {
-    const value = JSON.parse(localStorage.getItem(CUSTOM_SECTIONS_KEY));
-    return Array.isArray(value) ? value : [];
-  } catch { return []; }
-}
-
-function setCustomSections(value) {
-  localStorage.setItem(CUSTOM_SECTIONS_KEY, JSON.stringify(value));
-}
-
-function allSections() {
-  return [...baseSections, ...getCustomSections().map(section => ({ ...section, custom: true }))];
-}
-
-function makeId(prefix = 'item') {
-  return `${prefix}-${crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`}`;
-}
-
 const defaults = {
   'Δεξαμενές υδροχ/ΑΒ': '1.29', 'Δεξαμενή Σόδας Α': '3.4',
   'Γλυκόλη Αντλ. 302': '4.2', 'Γλυκόλη Αντλ. 303': '2.9', 'Στάθμη δεξαμενής': '1.25', 'Αλάτι': '2.5',
@@ -96,38 +75,19 @@ const operatorInput = document.getElementById('operator');
 const notesInput = document.getElementById('notes');
 let editingId = null;
 
-function keyFor(section, group, field, sectionId = '', fieldId = '') {
-  if (sectionId && fieldId) return `custom|||${sectionId}|||${fieldId}`;
+function keyFor(section, group, field) {
   return `${section}|||${group || 'Γενικά'}|||${field}`;
 }
 
-function renderForm(preservedValues = null, useDefaults = true) {
-  if (!preservedValues) {
-    preservedValues = {};
-    document.querySelectorAll('.measurement-input').forEach(input => { preservedValues[input.dataset.key] = input.value; });
-  }
+function renderForm() {
   root.innerHTML = '';
-  allSections().forEach(section => {
+  sections.forEach(section => {
     const card = document.createElement('section');
     card.className = 'card measurement-section';
-
-    if (section.custom) {
-      const head = document.createElement('div');
-      head.className = 'section-title-row';
-      head.innerHTML = `<h2 class="section-title">${escapeHtml(section.title)}</h2>
-        <div class="section-tools">
-          <button class="small-btn add-field" type="button">+ Μέτρηση</button>
-          <button class="small-btn danger remove-section" type="button">Διαγραφή τομέα</button>
-        </div>`;
-      head.querySelector('.add-field').addEventListener('click', () => addFieldToSection(section.id));
-      head.querySelector('.remove-section').addEventListener('click', () => removeCustomSection(section.id));
-      card.appendChild(head);
-    } else {
-      card.innerHTML = `<h2 class="section-title">${escapeHtml(section.title)}</h2>`;
-    }
-
+    card.innerHTML = `<h2 class="section-title">${escapeHtml(section.title)}</h2>`;
     const body = document.createElement('div');
     body.className = 'section-body';
+
     section.groups.forEach(group => {
       if (group.title) {
         const h3 = document.createElement('h3');
@@ -137,13 +97,12 @@ function renderForm(preservedValues = null, useDefaults = true) {
       }
       const grid = document.createElement('div');
       grid.className = 'measurement-grid';
-      group.fields.forEach(rawField => {
-        const field = typeof rawField === 'string' ? { label: rawField, id: '' } : rawField;
+      group.fields.forEach(field => {
         const row = document.createElement('label');
         row.className = 'measurement-row';
-        const key = keyFor(section.title, group.title, field.label, section.custom ? section.id : '', field.id || '');
-        const initial = Object.prototype.hasOwnProperty.call(preservedValues, key) ? preservedValues[key] : (useDefaults ? (defaults[field.label] || '') : '');
-        row.innerHTML = `<span class="measurement-label">${escapeHtml(field.label)}</span>
+        const key = keyFor(section.title, group.title, field);
+        const initial = defaults[field] || '';
+        row.innerHTML = `<span class="measurement-label">${escapeHtml(field)}</span>
           <input class="measurement-input" data-key="${escapeAttr(key)}" type="text" value="${escapeAttr(initial)}" placeholder="Τιμή" />`;
         grid.appendChild(row);
       });
@@ -152,47 +111,6 @@ function renderForm(preservedValues = null, useDefaults = true) {
     card.appendChild(body);
     root.appendChild(card);
   });
-}
-
-function addCustomSection() {
-  const titleInput = document.getElementById('newSectionName');
-  const fieldsInput = document.getElementById('newSectionFields');
-  const title = titleInput.value.trim();
-  const labels = fieldsInput.value.split(/\n|,/).map(value => value.trim()).filter(Boolean);
-  if (!title) return showToast('Γράψε το όνομα του νέου τομέα.');
-  if (!labels.length) return showToast('Πρόσθεσε τουλάχιστον μία μέτρηση.');
-  const custom = getCustomSections();
-  custom.push({
-    id: makeId('section'),
-    title,
-    groups: [{ title: '', fields: labels.map(label => ({ id: makeId('field'), label })) }]
-  });
-  setCustomSections(custom);
-  titleInput.value = '';
-  fieldsInput.value = '';
-  document.getElementById('addSectionPanel').hidden = true;
-  renderForm();
-  showToast('Ο νέος τομέας προστέθηκε.');
-}
-
-function addFieldToSection(sectionId) {
-  const label = prompt('Όνομα νέας μέτρησης:');
-  if (!label || !label.trim()) return;
-  const custom = getCustomSections();
-  const section = custom.find(item => item.id === sectionId);
-  if (!section) return;
-  section.groups[0].fields.push({ id: makeId('field'), label: label.trim() });
-  setCustomSections(custom);
-  renderForm();
-  showToast('Η μέτρηση προστέθηκε.');
-}
-
-function removeCustomSection(sectionId) {
-  const section = getCustomSections().find(item => item.id === sectionId);
-  if (!section || !confirm(`Να διαγραφεί ο τομέας «${section.title}» από τη φόρμα; Οι παλιές αποθηκευμένες καταχωρήσεις θα παραμείνουν στο ιστορικό.`)) return;
-  setCustomSections(getCustomSections().filter(item => item.id !== sectionId));
-  renderForm();
-  showToast('Ο τομέας διαγράφηκε από τη φόρμα.');
 }
 
 function setNow() {
@@ -217,7 +135,6 @@ function collectData() {
     operator: operatorInput.value.trim(),
     notes: notesInput.value.trim(),
     values,
-    schema: allSections(),
     savedAt: new Date().toISOString()
   };
 }
@@ -239,7 +156,7 @@ form.addEventListener('submit', event => {
 document.getElementById('clearBtn').addEventListener('click', () => {
   if (!confirm('Να καθαριστούν όλες οι τρέχουσες τιμές;')) return;
   editingId = null;
-  renderForm({}, false);
+  renderForm();
   operatorInput.value = '';
   notesInput.value = '';
   setNow();
@@ -272,14 +189,11 @@ function renderHistory(filter = '') {
 
 function historyHtml(entry) {
   let html = '';
-  const schema = Array.isArray(entry.schema) ? entry.schema : allSections();
-  schema.forEach(section => {
+  sections.forEach(section => {
     const rows = [];
-    section.groups.forEach(group => group.fields.forEach(rawField => {
-      const field = typeof rawField === 'string' ? { label: rawField, id: '' } : rawField;
-      const key = keyFor(section.title, group.title, field.label, section.custom ? section.id : '', field.id || '');
-      const value = entry.values[key] || '';
-      if (value) rows.push(`<tr><td>${escapeHtml(group.title ? `${group.title} – ${field.label}` : field.label)}</td><td>${escapeHtml(value)}</td></tr>`);
+    section.groups.forEach(group => group.fields.forEach(field => {
+      const value = entry.values[keyFor(section.title, group.title, field)] || '';
+      if (value) rows.push(`<tr><td>${escapeHtml(group.title ? `${group.title} – ${field}` : field)}</td><td>${escapeHtml(value)}</td></tr>`);
     }));
     if (rows.length) html += `<section class="history-section"><h4>${escapeHtml(section.title)}</h4><table class="history-table">${rows.join('')}</table></section>`;
   });
@@ -335,7 +249,7 @@ document.getElementById('deleteAllBtn').addEventListener('click', () => {
 
 document.getElementById('exportJsonBtn').addEventListener('click', () => downloadFile(
   `metriseis-pre-tekmon-${new Date().toISOString().slice(0,10)}.json`,
-  JSON.stringify({ version: 2, entries: getEntries(), customSections: getCustomSections() }, null, 2),
+  JSON.stringify(getEntries(), null, 2),
   'application/json'
 ));
 
@@ -353,19 +267,11 @@ document.getElementById('importJsonInput').addEventListener('change', async even
   if (!file) return;
   try {
     const data = JSON.parse(await file.text());
-    const importedEntries = Array.isArray(data) ? data : data.entries;
-    if (!Array.isArray(importedEntries)) throw new Error('invalid');
+    if (!Array.isArray(data)) throw new Error('invalid');
     const existing = getEntries();
     const map = new Map(existing.map(e => [e.id, e]));
-    importedEntries.forEach(e => { if (e && e.id && e.values) map.set(e.id, e); });
+    data.forEach(e => { if (e && e.id && e.values) map.set(e.id, e); });
     setEntries([...map.values()].sort((a,b) => (b.savedAt || '').localeCompare(a.savedAt || '')));
-    if (!Array.isArray(data) && Array.isArray(data.customSections)) {
-      const existingSections = getCustomSections();
-      const sectionMap = new Map(existingSections.map(section => [section.id, section]));
-      data.customSections.forEach(section => { if (section && section.id && section.title && section.groups) sectionMap.set(section.id, section); });
-      setCustomSections([...sectionMap.values()]);
-      renderForm();
-    }
     renderHistory();
     showToast('Η εισαγωγή ολοκληρώθηκε.');
   } catch { alert('Το αρχείο JSON δεν είναι έγκυρο.'); }
@@ -392,16 +298,6 @@ function showToast(message) {
   toast.textContent = message; toast.classList.add('show');
   clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove('show'), 2300);
 }
-
-document.getElementById('showAddSectionBtn').addEventListener('click', () => {
-  const panel = document.getElementById('addSectionPanel');
-  panel.hidden = !panel.hidden;
-  if (!panel.hidden) document.getElementById('newSectionName').focus();
-});
-document.getElementById('cancelAddSectionBtn').addEventListener('click', () => {
-  document.getElementById('addSectionPanel').hidden = true;
-});
-document.getElementById('addSectionBtn').addEventListener('click', addCustomSection);
 
 const themeBtn = document.getElementById('themeBtn');
 function applyTheme(theme) {
