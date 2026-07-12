@@ -67,6 +67,19 @@ const defaults = {
   'UF στάθμη': '3.21'
 };
 
+const toggleFields = new Set([
+  'Ηλεκτροβάνα', 'Βάνα ατμού', 'Αντλία P800-18', 'Αντλία P800-19',
+  'Ψυκτικό Α', 'Ψυκτικό Β', 'Ψυκτικό C'
+]);
+
+function isSplitField(field) {
+  return field.startsWith('Ψυκτικό μικρή/μεγάλη');
+}
+
+function splitKey(section, group, field, side) {
+  return `${keyFor(section, group, field)}|||${side}`;
+}
+
 const root = document.getElementById('sectionsRoot');
 const form = document.getElementById('measurementsForm');
 const dateInput = document.getElementById('entryDate');
@@ -98,12 +111,38 @@ function renderForm() {
       const grid = document.createElement('div');
       grid.className = 'measurement-grid';
       group.fields.forEach(field => {
-        const row = document.createElement('label');
+        const row = document.createElement('div');
         row.className = 'measurement-row';
         const key = keyFor(section.title, group.title, field);
         const initial = defaults[field] || '';
-        row.innerHTML = `<span class="measurement-label">${escapeHtml(field)}</span>
-          <input class="measurement-input" data-key="${escapeAttr(key)}" type="text" value="${escapeAttr(initial)}" placeholder="Τιμή" />`;
+
+        if (toggleFields.has(field)) {
+          row.innerHTML = `<span class="measurement-label">${escapeHtml(field)}</span>
+            <div class="toggle-wrap">
+              <input class="measurement-input toggle-value" data-key="${escapeAttr(key)}" type="hidden" value="${escapeAttr(initial)}" />
+              <button type="button" class="toggle-btn" data-value="On">ON</button>
+              <button type="button" class="toggle-btn" data-value="Off">OFF</button>
+            </div>`;
+          const hidden = row.querySelector('.toggle-value');
+          const buttons = row.querySelectorAll('.toggle-btn');
+          const updateToggle = value => {
+            hidden.value = value;
+            buttons.forEach(button => button.classList.toggle('active', button.dataset.value === value));
+          };
+          buttons.forEach(button => button.addEventListener('click', () => updateToggle(button.dataset.value)));
+          if (initial) updateToggle(initial.toLowerCase() === 'off' ? 'Off' : 'On');
+        } else if (isSplitField(field)) {
+          row.classList.add('split-row');
+          row.innerHTML = `<span class="measurement-label">${escapeHtml(field)}</span>
+            <div class="split-inputs">
+              <label><small>Μικρή</small><input class="measurement-input" data-key="${escapeAttr(splitKey(section.title, group.title, field, 'Μικρή'))}" type="text" inputmode="decimal" placeholder="Μικρή" /></label>
+              <label><small>Μεγάλη</small><input class="measurement-input" data-key="${escapeAttr(splitKey(section.title, group.title, field, 'Μεγάλη'))}" type="text" inputmode="decimal" placeholder="Μεγάλη" /></label>
+            </div>`;
+        } else {
+          const suffix = field === 'Capacity' ? '<span class="input-suffix">%</span>' : '';
+          row.innerHTML = `<span class="measurement-label">${escapeHtml(field)}</span>
+            <div class="input-with-suffix"><input class="measurement-input" data-key="${escapeAttr(key)}" type="text" value="${escapeAttr(initial)}" placeholder="Τιμή" inputmode="decimal" />${suffix}</div>`;
+        }
         grid.appendChild(row);
       });
       body.appendChild(grid);
@@ -192,7 +231,15 @@ function historyHtml(entry) {
   sections.forEach(section => {
     const rows = [];
     section.groups.forEach(group => group.fields.forEach(field => {
-      const value = entry.values[keyFor(section.title, group.title, field)] || '';
+      let value = '';
+      if (isSplitField(field)) {
+        const small = entry.values[splitKey(section.title, group.title, field, 'Μικρή')] || '';
+        const large = entry.values[splitKey(section.title, group.title, field, 'Μεγάλη')] || '';
+        if (small || large) value = `Μικρή: ${small || '—'} / Μεγάλη: ${large || '—'}`;
+      } else {
+        value = entry.values[keyFor(section.title, group.title, field)] || '';
+        if (field === 'Capacity' && value) value = `${value}%`;
+      }
       if (value) rows.push(`<tr><td>${escapeHtml(group.title ? `${group.title} – ${field}` : field)}</td><td>${escapeHtml(value)}</td></tr>`);
     }));
     if (rows.length) html += `<section class="history-section"><h4>${escapeHtml(section.title)}</h4><table class="history-table">${rows.join('')}</table></section>`;
@@ -209,6 +256,10 @@ function loadEntry(id) {
   operatorInput.value = entry.operator || '';
   notesInput.value = entry.notes || '';
   document.querySelectorAll('.measurement-input').forEach(input => { input.value = entry.values[input.dataset.key] || ''; });
+  document.querySelectorAll('.toggle-wrap').forEach(wrap => {
+    const hidden = wrap.querySelector('.toggle-value');
+    wrap.querySelectorAll('.toggle-btn').forEach(button => button.classList.toggle('active', button.dataset.value === hidden.value));
+  });
   editingId = id;
   document.getElementById('saveBtn').textContent = 'Ενημέρωση';
   switchView('formView');

@@ -167,3 +167,63 @@ summary { cursor: pointer; color: var(--primary); font-weight: 700; }
   .history-item.printing .history-details { display: grid; }
   .container { width: 100%; padding: 0; }
 }
+
+/* Ειδικά πεδία λειτουργίας και διπλών τιμών */
+.toggle-wrap {
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .45rem;
+  padding: .45rem;
+  border-left: 1px solid var(--border);
+  background: var(--bg);
+}
+.toggle-btn {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--muted);
+  font-weight: 800;
+  padding: .55rem .8rem;
+  min-width: 58px;
+}
+.toggle-btn.active {
+  color: white;
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.toggle-value { display: none; }
+.input-with-suffix { position: relative; min-width: 0; }
+.input-with-suffix .measurement-input { padding-right: 2.2rem; }
+.input-suffix {
+  position: absolute;
+  right: .8rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-weight: 800;
+  pointer-events: none;
+}
+.split-row { grid-template-columns: minmax(0, .9fr) minmax(190px, 1.1fr); }
+.split-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-left: 1px solid var(--border);
+  background: var(--bg);
+}
+.split-inputs label { gap: .15rem; padding: .35rem; }
+.split-inputs label + label { border-left: 1px solid var(--border); }
+.split-inputs small { text-align: center; color: var(--muted); font-weight: 750; }
+.split-inputs .measurement-input {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  min-height: 42px;
+  text-align: center;
+}
+
+@media (max-width: 520px) {
+  .split-row { grid-template-columns: 1fr; }
+  .split-inputs { border-left: 0; border-top: 1px solid var(--border); }
+  .toggle-wrap { border-left: 1px solid var(--border); }
+}
