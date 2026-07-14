@@ -1,5 +1,7 @@
 const STORAGE_KEY = 'preTekmonMeasurementsV1';
 const THEME_KEY = 'preTekmonTheme';
+const DRAFT_KEY = 'preTekmonCurrentDraftV1';
+const LAST_SAVED_KEY = 'preTekmonLastSavedIdV1';
 
 const sections = [
   {
@@ -87,6 +89,8 @@ const timeInput = document.getElementById('entryTime');
 const operatorInput = document.getElementById('operator');
 const notesInput = document.getElementById('notes');
 let editingId = null;
+let isRestoring = false;
+let draftTimer = null;
 
 function keyFor(section, group, field) {
   return `${section}|||${group || 'Γενικά'}|||${field}`;
@@ -128,6 +132,7 @@ function renderForm() {
           const updateToggle = value => {
             hidden.value = value;
             buttons.forEach(button => button.classList.toggle('active', button.dataset.value === value));
+            scheduleDraftSave();
           };
           buttons.forEach(button => button.addEventListener('click', () => updateToggle(button.dataset.value)));
           if (initial) updateToggle(initial.toLowerCase() === 'off' ? 'Off' : 'On');
@@ -164,6 +169,87 @@ function getEntries() {
 }
 function setEntries(entries) { localStorage.setItem(STORAGE_KEY, JSON.stringify(entries)); }
 
+
+function currentFormState() {
+  const values = {};
+  document.querySelectorAll('.measurement-input').forEach(input => {
+    values[input.dataset.key] = input.value;
+  });
+  return {
+    editingId,
+    date: dateInput.value,
+    time: timeInput.value,
+    operator: operatorInput.value,
+    notes: notesInput.value,
+    values,
+    updatedAt: new Date().toISOString()
+  };
+}
+
+function saveDraftNow() {
+  if (isRestoring) return;
+  try { localStorage.setItem(DRAFT_KEY, JSON.stringify(currentFormState())); }
+  catch (error) { console.warn('Δεν ήταν δυνατή η προσωρινή αποθήκευση.', error); }
+}
+
+function scheduleDraftSave() {
+  if (isRestoring) return;
+  clearTimeout(draftTimer);
+  draftTimer = setTimeout(saveDraftNow, 120);
+}
+
+function applyState(state) {
+  if (!state || !state.values) return false;
+  isRestoring = true;
+  dateInput.value = state.date || '';
+  timeInput.value = state.time || '';
+  operatorInput.value = state.operator || '';
+  notesInput.value = state.notes || '';
+  document.querySelectorAll('.measurement-input').forEach(input => {
+    input.value = state.values[input.dataset.key] ?? '';
+  });
+  document.querySelectorAll('.toggle-wrap').forEach(wrap => {
+    const hidden = wrap.querySelector('.toggle-value');
+    wrap.querySelectorAll('.toggle-btn').forEach(button => {
+      button.classList.toggle('active', button.dataset.value === hidden.value);
+    });
+  });
+  editingId = state.editingId || state.id || null;
+  document.getElementById('saveBtn').textContent = editingId ? 'Ενημέρωση' : 'Αποθήκευση';
+  isRestoring = false;
+  return true;
+}
+
+function restoreInitialState() {
+  let draft = null;
+  try { draft = JSON.parse(localStorage.getItem(DRAFT_KEY)); } catch {}
+  if (draft && applyState(draft)) return;
+
+  const entries = getEntries();
+  const lastId = localStorage.getItem(LAST_SAVED_KEY);
+  const latest = entries.find(entry => entry.id === lastId) || entries[0];
+  if (latest) {
+    applyState({ ...latest, editingId: latest.id });
+    saveDraftNow();
+    return;
+  }
+  setNow();
+  saveDraftNow();
+}
+
+function bindDraftAutosave() {
+  form.addEventListener('input', scheduleDraftSave);
+  form.addEventListener('change', scheduleDraftSave);
+  dateInput.addEventListener('input', scheduleDraftSave);
+  timeInput.addEventListener('input', scheduleDraftSave);
+  operatorInput.addEventListener('input', scheduleDraftSave);
+  notesInput.addEventListener('input', scheduleDraftSave);
+  window.addEventListener('pagehide', saveDraftNow);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') saveDraftNow();
+  });
+}
+
 function collectData() {
   const values = {};
   document.querySelectorAll('.measurement-input').forEach(input => { values[input.dataset.key] = input.value.trim(); });
@@ -186,20 +272,38 @@ form.addEventListener('submit', event => {
   const index = entries.findIndex(item => item.id === entry.id);
   if (index >= 0) entries[index] = entry; else entries.unshift(entry);
   setEntries(entries);
-  editingId = null;
-  document.getElementById('saveBtn').textContent = 'Αποθήκευση';
+  editingId = entry.id;
+  localStorage.setItem(LAST_SAVED_KEY, entry.id);
+  document.getElementById('saveBtn').textContent = 'Ενημέρωση';
+  saveDraftNow();
   renderHistory();
-  showToast(index >= 0 ? 'Η καταχώρηση ενημερώθηκε.' : 'Η καταχώρηση αποθηκεύτηκε.');
+  showToast(index >= 0 ? 'Η καταχώρηση ενημερώθηκε και θα ανοίγει αυτόματα.' : 'Η καταχώρηση αποθηκεύτηκε και θα ανοίγει αυτόματα.');
 });
 
 document.getElementById('clearBtn').addEventListener('click', () => {
   if (!confirm('Να καθαριστούν όλες οι τρέχουσες τιμές;')) return;
+
   editingId = null;
-  renderForm();
+
+  // Καθαρίζει όλα τα πεδία, μαζί με τα κρυφά πεδία των ON/OFF.
+  document.querySelectorAll('.measurement-input').forEach(input => {
+    input.value = '';
+  });
+
+  // Αφαιρεί την ενεργή επιλογή από όλα τα κουμπιά ON/OFF.
+  document.querySelectorAll('.toggle-btn').forEach(button => {
+    button.classList.remove('active');
+  });
+
   operatorInput.value = '';
   notesInput.value = '';
   setNow();
+  localStorage.removeItem(DRAFT_KEY);
+  localStorage.removeItem(LAST_SAVED_KEY);
   document.getElementById('saveBtn').textContent = 'Αποθήκευση';
+  // Αποθηκεύει την καθαρή κατάσταση ώστε να παραμείνει καθαρή και μετά από νέο άνοιγμα.
+  saveDraftNow();
+  showToast('Η φόρμα καθαρίστηκε και θα παραμείνει κενή.');
 });
 
 function renderHistory(filter = '') {
@@ -251,17 +355,9 @@ function historyHtml(entry) {
 function loadEntry(id) {
   const entry = getEntries().find(item => item.id === id);
   if (!entry) return;
-  dateInput.value = entry.date;
-  timeInput.value = entry.time;
-  operatorInput.value = entry.operator || '';
-  notesInput.value = entry.notes || '';
-  document.querySelectorAll('.measurement-input').forEach(input => { input.value = entry.values[input.dataset.key] || ''; });
-  document.querySelectorAll('.toggle-wrap').forEach(wrap => {
-    const hidden = wrap.querySelector('.toggle-value');
-    wrap.querySelectorAll('.toggle-btn').forEach(button => button.classList.toggle('active', button.dataset.value === hidden.value));
-  });
-  editingId = id;
-  document.getElementById('saveBtn').textContent = 'Ενημέρωση';
+  applyState({ ...entry, editingId: id });
+  localStorage.setItem(LAST_SAVED_KEY, id);
+  saveDraftNow();
   switchView('formView');
   window.scrollTo({ top: 0, behavior: 'smooth' });
   showToast('Η καταχώρηση άνοιξε για επεξεργασία.');
@@ -359,6 +455,7 @@ themeBtn.addEventListener('click', () => applyTheme(document.documentElement.dat
 applyTheme(localStorage.getItem(THEME_KEY) || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
 
 renderForm();
-setNow();
+bindDraftAutosave();
+restoreInitialState();
 renderHistory();
 if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
