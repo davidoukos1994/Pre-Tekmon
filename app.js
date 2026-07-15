@@ -70,9 +70,12 @@ const defaults = {
 };
 
 const toggleFields = new Set([
-  'Ηλεκτροβάνα', 'Βάνα ατμού', 'Αντλία P800-18', 'Αντλία P800-19',
+  'Βάνα ατμού', 'Βάνα φρεατίου', 'Βάνα εισόδου',
+  'Αντλία P800-18', 'Αντλία P800-19',
   'Ψυκτικό Α', 'Ψυκτικό Β', 'Ψυκτικό C'
 ]);
+
+const toggleWithValueFields = new Set(['Ηλεκτροβάνα']);
 
 function isSplitField(field) {
   return field.startsWith('Ψυκτικό μικρή/μεγάλη');
@@ -120,7 +123,28 @@ function renderForm() {
         const key = keyFor(section.title, group.title, field);
         const initial = defaults[field] || '';
 
-        if (toggleFields.has(field)) {
+        if (toggleWithValueFields.has(field)) {
+          const valueKey = `${key}|||Τιμή`;
+          row.classList.add('toggle-value-row');
+          row.innerHTML = `<span class="measurement-label">${escapeHtml(field)}</span>
+            <div class="toggle-with-input">
+              <div class="toggle-wrap">
+                <input class="measurement-input toggle-value" data-key="${escapeAttr(key)}" type="hidden" value="${escapeAttr(initial)}" />
+                <button type="button" class="toggle-btn" data-value="On">ON</button>
+                <button type="button" class="toggle-btn" data-value="Off">OFF</button>
+              </div>
+              <input class="measurement-input" data-key="${escapeAttr(valueKey)}" type="text" placeholder="Τιμή" />
+            </div>`;
+          const hidden = row.querySelector('.toggle-value');
+          const buttons = row.querySelectorAll('.toggle-btn');
+          const updateToggle = value => {
+            hidden.value = value;
+            buttons.forEach(button => button.classList.toggle('active', button.dataset.value === value));
+            scheduleDraftSave();
+          };
+          buttons.forEach(button => button.addEventListener('click', () => updateToggle(button.dataset.value)));
+          if (initial) updateToggle(initial.toLowerCase() === 'off' ? 'Off' : 'On');
+        } else if (toggleFields.has(field)) {
           row.innerHTML = `<span class="measurement-label">${escapeHtml(field)}</span>
             <div class="toggle-wrap">
               <input class="measurement-input toggle-value" data-key="${escapeAttr(key)}" type="hidden" value="${escapeAttr(initial)}" />
@@ -343,6 +367,10 @@ function historyHtml(entry) {
         const small = entry.values[splitKey(section.title, group.title, field, 'Μικρή')] || '';
         const large = entry.values[splitKey(section.title, group.title, field, 'Μεγάλη')] || '';
         if (small || large) value = `Μικρή: ${small || '—'} / Μεγάλη: ${large || '—'}`;
+      } else if (toggleWithValueFields.has(field)) {
+        const status = entry.values[keyFor(section.title, group.title, field)] || '';
+        const measuredValue = entry.values[`${keyFor(section.title, group.title, field)}|||Τιμή`] || '';
+        if (status || measuredValue) value = `${status || '—'}${measuredValue ? ` / Τιμή: ${measuredValue}` : ''}`;
       } else {
         value = entry.values[keyFor(section.title, group.title, field)] || '';
         if (field === 'Capacity' && value) value = `${value}%`;

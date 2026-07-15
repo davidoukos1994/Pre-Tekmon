@@ -1,4 +1,4 @@
-const CACHE = 'pre-tekmon-v5-clear-keyboard';
+const CACHE = 'pre-tekmon-v6-valves-electrovalve';
 const ASSETS = ['./', './index.html', './styles.css', './app.js', './manifest.webmanifest'];
 
 self.addEventListener('install', event => {
