@@ -140,13 +140,13 @@ function renderForm() {
           row.classList.add('split-row');
           row.innerHTML = `<span class="measurement-label">${escapeHtml(field)}</span>
             <div class="split-inputs">
-              <label><small>Μικρή</small><input class="measurement-input" data-key="${escapeAttr(splitKey(section.title, group.title, field, 'Μικρή'))}" type="text" inputmode="decimal" placeholder="Μικρή" /></label>
-              <label><small>Μεγάλη</small><input class="measurement-input" data-key="${escapeAttr(splitKey(section.title, group.title, field, 'Μεγάλη'))}" type="text" inputmode="decimal" placeholder="Μεγάλη" /></label>
+              <label><small>Μικρή</small><input class="measurement-input" data-key="${escapeAttr(splitKey(section.title, group.title, field, 'Μικρή'))}" type="text" placeholder="Μικρή" /></label>
+              <label><small>Μεγάλη</small><input class="measurement-input" data-key="${escapeAttr(splitKey(section.title, group.title, field, 'Μεγάλη'))}" type="text" placeholder="Μεγάλη" /></label>
             </div>`;
         } else {
           const suffix = field === 'Capacity' ? '<span class="input-suffix">%</span>' : '';
           row.innerHTML = `<span class="measurement-label">${escapeHtml(field)}</span>
-            <div class="input-with-suffix"><input class="measurement-input" data-key="${escapeAttr(key)}" type="text" value="${escapeAttr(initial)}" placeholder="Τιμή" inputmode="decimal" />${suffix}</div>`;
+            <div class="input-with-suffix"><input class="measurement-input" data-key="${escapeAttr(key)}" type="text" value="${escapeAttr(initial)}" placeholder="Τιμή" />${suffix}</div>`;
         }
         grid.appendChild(row);
       });
@@ -283,27 +283,30 @@ form.addEventListener('submit', event => {
 document.getElementById('clearBtn').addEventListener('click', () => {
   if (!confirm('Να καθαριστούν όλες οι τρέχουσες τιμές;')) return;
 
+  clearTimeout(draftTimer);
+  isRestoring = true;
   editingId = null;
 
-  // Καθαρίζει όλα τα πεδία, μαζί με τα κρυφά πεδία των ON/OFF.
-  document.querySelectorAll('.measurement-input').forEach(input => {
-    input.value = '';
+  // Καθαρίζει κάθε πεδίο της τρέχουσας φόρμας, μαζί με τα κρυφά ON/OFF.
+  form.querySelectorAll('input, textarea').forEach(field => {
+    if (field.type !== 'date' && field.type !== 'time') field.value = '';
   });
 
-  // Αφαιρεί την ενεργή επιλογή από όλα τα κουμπιά ON/OFF.
-  document.querySelectorAll('.toggle-btn').forEach(button => {
-    button.classList.remove('active');
-  });
-
+  document.querySelectorAll('.toggle-btn').forEach(button => button.classList.remove('active'));
   operatorInput.value = '';
   notesInput.value = '';
+
+  // Η ημερομηνία και η ώρα παραμένουν χρήσιμες και επανέρχονται στην τρέχουσα στιγμή.
   setNow();
+  document.getElementById('saveBtn').textContent = 'Αποθήκευση';
+
+  // Αφαιρεί την προηγούμενη πρόχειρη/τελευταία κατάσταση και γράφει αμέσως την καθαρή φόρμα.
   localStorage.removeItem(DRAFT_KEY);
   localStorage.removeItem(LAST_SAVED_KEY);
-  document.getElementById('saveBtn').textContent = 'Αποθήκευση';
-  // Αποθηκεύει την καθαρή κατάσταση ώστε να παραμείνει καθαρή και μετά από νέο άνοιγμα.
-  saveDraftNow();
-  showToast('Η φόρμα καθαρίστηκε και θα παραμείνει κενή.');
+  isRestoring = false;
+  localStorage.setItem(DRAFT_KEY, JSON.stringify(currentFormState()));
+
+  showToast('Καθαρίστηκαν όλες οι τιμές της φόρμας.');
 });
 
 function renderHistory(filter = '') {
