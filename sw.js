@@ -1,4 +1,4 @@
-const CACHE = 'pre-tekmon-v6-valves-electrovalve';
+const CACHE = 'pre-tekmon-v7-set-point';
 const ASSETS = ['./', './index.html', './styles.css', './app.js', './manifest.webmanifest'];
 
 self.addEventListener('install', event => {
