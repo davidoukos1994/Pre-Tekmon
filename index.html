@@ -39,12 +39,17 @@
 
     <section id="formView" class="view active">
       <form id="measurementsForm" autocomplete="off">
-        <div id="sectionsRoot"></div>
+        <div class="workspace">
+          <div class="workspace-main">
+            <div id="sectionsRoot"></div>
 
-        <section class="card notes-card">
+            <section id="notesPanel" class="card notes-card">
           <h2>Σημειώσεις</h2>
           <textarea id="notes" rows="5" placeholder="Παρατηρήσεις, βλάβες, ενέργειες..."></textarea>
-        </section>
+            </section>
+          </div>
+          <nav id="sectionTabs" class="section-tabs" aria-label="Καρτέλες μετρήσεων"></nav>
+        </div>
 
         <div class="sticky-actions">
           <button id="clearBtn" class="btn secondary" type="button">Καθαρισμός</button>

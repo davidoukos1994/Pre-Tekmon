@@ -1,4 +1,4 @@
-const CACHE = 'pre-tekmon-v8-1-hcl-ab-d902';
+const CACHE = 'pre-tekmon-v9-section-tabs';
 const ASSETS = ['./', './index.html', './styles.css', './app.js', './manifest.webmanifest'];
 
 self.addEventListener('install', event => {

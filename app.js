@@ -2,9 +2,12 @@ const STORAGE_KEY = 'preTekmonMeasurementsV1';
 const THEME_KEY = 'preTekmonTheme';
 const DRAFT_KEY = 'preTekmonCurrentDraftV1';
 const LAST_SAVED_KEY = 'preTekmonLastSavedIdV1';
+const ACTIVE_SECTION_KEY = 'preTekmonActiveSectionV1';
 
 const sections = [
   {
+    id: 'general-core',
+    category: 'general',
     title: 'Γενικές μετρήσεις',
     groups: [
       { title: '', fields: [
@@ -16,24 +19,24 @@ const sections = [
     ]
   },
   {
-    title: 'Στάθμες δεξαμενών',
-    groups: [
-      { title: '', fields: ['Ζ1', 'Ζ2', 'Ζ3', 'Δ1', 'Δ2', 'Δ3'] }
-    ]
-  },
-  {
+    id: 'glycol',
+    category: 'general',
     title: 'Νερό ψυκτικού – Γλυκόλη',
     groups: [
       { title: '', fields: ['Γλυκόλη Αντλ. 302', 'Γλυκόλη Αντλ. 303', 'Στάθμη δεξαμενής'] }
     ]
   },
   {
+    id: 'electric-boiler',
+    category: 'general',
     title: 'Ηλεκτρικός ατμολέβητας',
     groups: [
       { title: '', fields: ['Πίεση PV', 'Βάνα ατμού', 'Εξωτερικός ατμός'] }
     ]
   },
   {
+    id: 'oil-boiler',
+    category: 'general',
     title: 'Λέβητας πετρελαίου / Λεβητοστάσιο',
     groups: [
       { title: 'Καύσιμο', fields: ['Δεξαμενή πετρελαίου', 'Μετρητής'] },
@@ -41,32 +44,66 @@ const sections = [
     ]
   },
   {
+    id: 'coolers',
+    category: 'coolers',
     title: 'Ψυκτικά - Μετρήσεις',
     groups: [
-      { title: 'Ψυκτικό Β', fields: ['Ψυκτικό Β', 'Set Point', 'Πίεση αντλίας', 'Διαφορική πίεση', 'Διαφορική γλυκόλης', 'Νερού θερμοκρασία (είσοδος/έξοδος)', 'Γλυκόλη θερμοκρασία (είσοδος/έξοδος)', 'Ψυκτικό μικρή/μεγάλη 1', 'Ψυκτικό μικρή/μεγάλη 2'] },
-      { title: 'Ψυκτικό Α', fields: ['Ψυκτικό Α', 'Set Point', 'Πίεση αντλίας', 'Διαφορική πίεση', 'Διαφορική γλυκόλης', 'Νερού θερμοκρασία (είσοδος/έξοδος)', 'Γλυκόλη θερμοκρασία (είσοδος/έξοδος)', 'Ψυκτικό μικρή/μεγάλη 1', 'Ψυκτικό μικρή/μεγάλη 2'] },
-      { title: 'Ψυκτικό C', fields: ['Ψυκτικό C', 'Set Point', 'Capacity', 'Πίεση αντλίας', 'Διαφορική πίεση', 'Διαφορική γλυκόλης', 'Νερού θερμοκρασία (είσοδος/έξοδος)', 'Γλυκόλη θερμοκρασία (είσοδος/έξοδος)', 'Ψυκτικό μικρή/μεγάλη'] }
+      { title: 'Ψυκτικό Α', fields: ['Ψυκτικό Α', 'Set Point', 'Πίεση αντλίας μικρή', 'Πίεση αντλίας μεγάλη', 'Διαφορική πίεση', 'Διαφορική γλυκόλης', 'Θερμοκρασία νερού είσοδος', 'Θερμοκρασία νερού έξοδος', 'Θερμοκρασία γλυκόλης είσοδος', 'Θερμοκρασία γλυκόλης έξοδος', 'Ψυκτικό μικρή/μεγάλη'] },
+      { title: 'Ψυκτικό Β', fields: ['Ψυκτικό Β', 'Set Point', 'Πίεση αντλίας μικρή', 'Πίεση αντλίας μεγάλη', 'Διαφορική πίεση', 'Διαφορική γλυκόλης', 'Θερμοκρασία νερού είσοδος', 'Θερμοκρασία νερού έξοδος', 'Θερμοκρασία γλυκόλης είσοδος', 'Θερμοκρασία γλυκόλης έξοδος', 'Ψυκτικό μικρή/μεγάλη'] },
+      { title: 'Ψυκτικό C', fields: ['Ψυκτικό C', 'Set Point', 'Capacity', 'Πίεση αντλίας μικρή', 'Πίεση αντλίας μεγάλη', 'Διαφορική πίεση', 'Διαφορική γλυκόλης', 'Θερμοκρασία νερού είσοδος', 'Θερμοκρασία νερού έξοδος', 'Θερμοκρασία γλυκόλης είσοδος', 'Θερμοκρασία γλυκόλης έξοδος', 'Ψυκτικό μικρή/μεγάλη'] }
     ]
   },
   {
+    id: 'tank-levels',
+    category: 'tanks',
+    title: 'Στάθμες δεξαμενών',
+    groups: [
+      { title: '', fields: ['Ζ1', 'Ζ2', 'Ζ3', 'Δ1', 'Δ2', 'Δ3'] }
+    ]
+  },
+  {
+    id: 'chemical-tanks',
+    category: 'tanks',
     title: 'Δεξαμενές χημικών',
     groups: [
       { title: '', fields: ['Stabifluid δεξαμενή', 'Na₂CO₃ δεξαμενή', 'Αγωγιμότητα', 'pH'] }
     ]
   },
   {
+    id: 'ro',
+    category: 'ro',
     title: 'RO 2nd pass / Ώσμωση 3–4',
     groups: [
       { title: '', fields: ['Βάνα φρεατίου', 'Αντλία P800-18', 'Βάνα εισόδου', 'Αντλία P800-19', 'Αγωγιμότητα 3/4', 'Ώρες λειτουργίας 3/4', 'Απόβλητα βυτίο', 'Απόβλητα επεξεργασία', 'Προς Άσωπο', 'Προς γεώτρηση'] }
     ]
   },
   {
+    id: 'uf',
+    category: 'ro',
     title: 'UF Μετρήσεις',
     groups: [
       { title: '', fields: ['UF στάθμη', 'Αγωγιμότητα'] }
     ]
   }
 ];
+
+const categoryTabs = [
+  { id: 'general', label: 'Γενικές', fullLabel: 'Γενικές Μετρήσεις', icon: '▣' },
+  { id: 'coolers', label: 'Ψυκτικά', fullLabel: 'Ψυκτικά Α + Β + C', icon: '❄' },
+  { id: 'tanks', label: 'Δεξαμενές', fullLabel: 'Στάθμες Δεξαμενών', icon: '▥' },
+  { id: 'ro', label: 'RO / UF', fullLabel: 'RO / UF', icon: '◉' },
+  { id: 'notes', label: 'Αποθήκευση', fullLabel: 'Παρατηρήσεις & Αποθήκευση', icon: '✎' }
+];
+
+const displayLabels = new Map([
+  ['Επιλογή γεμίσματος υδροχλωρικού', 'Πού γεμίζω'],
+  ['Επιλογή γεμίσματος σόδας', 'Πού γεμίζω'],
+  ['Capacity', 'Capacity (%)']
+]);
+
+function labelFor(field) {
+  return displayLabels.get(field) || field;
+}
 
 const defaults = {
   'Δεξαμενές υδροχ/ΑΒ': '1.29', 'Δεξαμενή Σόδας Α': '3.4',
@@ -90,7 +127,7 @@ const timeFields = new Set(['A/C ηλεκτρολύτη']);
 
 const choiceFields = new Map([
   ['Επιλογή γεμίσματος υδροχλωρικού', ['Α&Β', 'D-902']],
-  ['Επιλογή γεμίσματος σόδας', ['Α', 'D904']]
+  ['Επιλογή γεμίσματος σόδας', ['Α', 'D-904']]
 ]);
 
 function isSplitField(field) {
@@ -102,6 +139,8 @@ function splitKey(section, group, field, side) {
 }
 
 const root = document.getElementById('sectionsRoot');
+const sectionTabsRoot = document.getElementById('sectionTabs');
+const notesPanel = document.getElementById('notesPanel');
 const form = document.getElementById('measurementsForm');
 const dateInput = document.getElementById('entryDate');
 const timeInput = document.getElementById('entryTime');
@@ -117,9 +156,23 @@ function keyFor(section, group, field) {
 
 function renderForm() {
   root.innerHTML = '';
+  sectionTabsRoot.innerHTML = '';
+
+  categoryTabs.forEach(item => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'section-tab';
+    button.dataset.categoryTarget = item.id;
+    button.innerHTML = `<span class="section-tab-icon">${item.icon}</span><span class="section-tab-label"><strong>${escapeHtml(item.label)}</strong><small>${escapeHtml(item.fullLabel)}</small></span>`;
+    button.addEventListener('click', () => showCategory(item.id, true));
+    sectionTabsRoot.appendChild(button);
+  });
+
   sections.forEach(section => {
     const card = document.createElement('section');
-    card.className = 'card measurement-section';
+    card.id = section.id;
+    card.dataset.category = section.category;
+    card.className = 'card measurement-section category-panel';
     card.innerHTML = `<h2 class="section-title">${escapeHtml(section.title)}</h2>`;
     const body = document.createElement('div');
     body.className = 'section-body';
@@ -138,14 +191,15 @@ function renderForm() {
         row.className = 'measurement-row';
         const key = keyFor(section.title, group.title, field);
         const initial = defaults[field] || '';
+        const shownLabel = labelFor(field);
 
         if (timeFields.has(field)) {
-          row.innerHTML = `<span class="measurement-label">${escapeHtml(field)}</span>
+          row.innerHTML = `<span class="measurement-label">${escapeHtml(shownLabel)}</span>
             <input class="measurement-input" data-key="${escapeAttr(key)}" type="time" />`;
         } else if (choiceFields.has(field)) {
           const options = choiceFields.get(field);
           row.classList.add('choice-row');
-          row.innerHTML = `<span class="measurement-label">${escapeHtml(field)}</span>
+          row.innerHTML = `<span class="measurement-label">${escapeHtml(shownLabel)}</span>
             <div class="choice-wrap">
               <input class="measurement-input choice-value" data-key="${escapeAttr(key)}" type="hidden" value="" />
               ${options.map(option => `<button type="button" class="choice-btn" data-value="${escapeAttr(option)}">${escapeHtml(option)}</button>`).join('')}
@@ -161,7 +215,7 @@ function renderForm() {
         } else if (toggleWithValueFields.has(field)) {
           const valueKey = `${key}|||Τιμή`;
           row.classList.add('toggle-value-row');
-          row.innerHTML = `<span class="measurement-label">${escapeHtml(field)}</span>
+          row.innerHTML = `<span class="measurement-label">${escapeHtml(shownLabel)}</span>
             <div class="toggle-with-input">
               <div class="toggle-wrap">
                 <input class="measurement-input toggle-value" data-key="${escapeAttr(key)}" type="hidden" value="${escapeAttr(initial)}" />
@@ -180,7 +234,7 @@ function renderForm() {
           buttons.forEach(button => button.addEventListener('click', () => updateToggle(button.dataset.value)));
           if (initial) updateToggle(initial.toLowerCase() === 'off' ? 'Off' : 'On');
         } else if (toggleFields.has(field)) {
-          row.innerHTML = `<span class="measurement-label">${escapeHtml(field)}</span>
+          row.innerHTML = `<span class="measurement-label">${escapeHtml(shownLabel)}</span>
             <div class="toggle-wrap">
               <input class="measurement-input toggle-value" data-key="${escapeAttr(key)}" type="hidden" value="${escapeAttr(initial)}" />
               <button type="button" class="toggle-btn" data-value="On">ON</button>
@@ -197,14 +251,14 @@ function renderForm() {
           if (initial) updateToggle(initial.toLowerCase() === 'off' ? 'Off' : 'On');
         } else if (isSplitField(field)) {
           row.classList.add('split-row');
-          row.innerHTML = `<span class="measurement-label">${escapeHtml(field)}</span>
+          row.innerHTML = `<span class="measurement-label">${escapeHtml(shownLabel)}</span>
             <div class="split-inputs">
               <label><small>Μικρή</small><input class="measurement-input" data-key="${escapeAttr(splitKey(section.title, group.title, field, 'Μικρή'))}" type="text" placeholder="Μικρή" /></label>
               <label><small>Μεγάλη</small><input class="measurement-input" data-key="${escapeAttr(splitKey(section.title, group.title, field, 'Μεγάλη'))}" type="text" placeholder="Μεγάλη" /></label>
             </div>`;
         } else {
           const suffix = field === 'Capacity' ? '<span class="input-suffix">%</span>' : '';
-          row.innerHTML = `<span class="measurement-label">${escapeHtml(field)}</span>
+          row.innerHTML = `<span class="measurement-label">${escapeHtml(shownLabel)}</span>
             <div class="input-with-suffix"><input class="measurement-input" data-key="${escapeAttr(key)}" type="text" value="${escapeAttr(initial)}" placeholder="Τιμή" />${suffix}</div>`;
         }
         grid.appendChild(row);
@@ -214,8 +268,30 @@ function renderForm() {
     card.appendChild(body);
     root.appendChild(card);
   });
+
+  notesPanel.dataset.category = 'notes';
+  notesPanel.classList.remove('section-panel');
+  notesPanel.classList.add('category-panel');
+
+  const savedCategory = localStorage.getItem(ACTIVE_SECTION_KEY);
+  const validCategory = categoryTabs.some(item => item.id === savedCategory) ? savedCategory : 'general';
+  showCategory(validCategory, false);
 }
 
+function showCategory(categoryId, scrollIntoView = false) {
+  document.querySelectorAll('.category-panel').forEach(panel => {
+    panel.classList.toggle('active', panel.dataset.category === categoryId);
+  });
+  document.querySelectorAll('.section-tab').forEach(tab => {
+    const active = tab.dataset.categoryTarget === categoryId;
+    tab.classList.toggle('active', active);
+    tab.setAttribute('aria-selected', active ? 'true' : 'false');
+  });
+  localStorage.setItem(ACTIVE_SECTION_KEY, categoryId);
+  if (scrollIntoView) {
+    document.querySelector('.workspace-main')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
 function setNow() {
   const now = new Date();
   dateInput.value = now.toLocaleDateString('en-CA');
@@ -418,7 +494,7 @@ function historyHtml(entry) {
         value = entry.values[keyFor(section.title, group.title, field)] || '';
         if (field === 'Capacity' && value) value = `${value}%`;
       }
-      if (value) rows.push(`<tr><td>${escapeHtml(group.title ? `${group.title} – ${field}` : field)}</td><td>${escapeHtml(value)}</td></tr>`);
+      if (value) rows.push(`<tr><td>${escapeHtml(group.title ? `${group.title} – ${labelFor(field)}` : labelFor(field))}</td><td>${escapeHtml(value)}</td></tr>`);
     }));
     if (rows.length) html += `<section class="history-section"><h4>${escapeHtml(section.title)}</h4><table class="history-table">${rows.join('')}</table></section>`;
   });

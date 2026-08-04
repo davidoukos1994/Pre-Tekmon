@@ -280,3 +280,134 @@ summary { cursor: pointer; color: var(--primary); font-weight: 700; }
   border-color: var(--primary);
   color: white;
 }
+
+/* Καρτέλες τομέων μετρήσεων */
+.section-tabs {
+  position: sticky;
+  top: 78px;
+  z-index: 15;
+  display: flex;
+  gap: .55rem;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: thin;
+  padding: .7rem;
+  margin: 0 0 1rem;
+  background: color-mix(in srgb, var(--bg) 90%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  -webkit-overflow-scrolling: touch;
+}
+.section-tab {
+  flex: 0 0 auto;
+  max-width: 220px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: .7rem .95rem;
+  background: var(--card);
+  color: var(--text);
+  font-weight: 750;
+  white-space: nowrap;
+}
+.section-tab.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+.section-panel { display: none; }
+.section-panel.active { display: block; }
+
+@media (max-width: 760px) {
+  .section-tabs { top: 72px; margin-inline: -.25rem; border-radius: 14px; }
+  .section-tab { max-width: none; font-size: .9rem; }
+}
+
+/* v10: δεξιά κάθετη πλοήγηση ανά ενότητα */
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  gap: 1rem;
+  align-items: start;
+}
+.workspace-main { min-width: 0; }
+.category-panel { display: none; }
+.category-panel.active { display: block; }
+.section-tabs {
+  position: sticky;
+  top: 92px;
+  z-index: 15;
+  display: grid;
+  gap: .55rem;
+  overflow: visible;
+  padding: .65rem;
+  margin: 0;
+  background: color-mix(in srgb, var(--card) 94%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+}
+.section-tab {
+  width: 100%;
+  max-width: none;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  align-items: center;
+  gap: .55rem;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  padding: .75rem .7rem;
+  text-align: left;
+  white-space: normal;
+  background: transparent;
+}
+.section-tab:hover { background: color-mix(in srgb, var(--primary) 8%, var(--card)); }
+.section-tab.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+.section-tab-icon { font-size: 1.2rem; text-align: center; }
+.section-tab-label { display: grid; gap: .1rem; min-width: 0; }
+.section-tab-label strong { font-size: .92rem; }
+.section-tab-label small { font-size: .7rem; color: var(--muted); line-height: 1.2; }
+.section-tab.active .section-tab-label small { color: rgba(255,255,255,.78); }
+
+/* Όλα τα ψυκτικά μαζί και με καθαρή ομαδοποίηση */
+#coolers .subsection-title {
+  margin: 1rem 0 .55rem;
+  padding: .75rem .85rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--primary) 9%, var(--card));
+  color: var(--primary);
+}
+#coolers .subsection-title:first-child { margin-top: .1rem; }
+
+@media (max-width: 760px) {
+  .container { padding-left: .55rem; padding-right: .55rem; }
+  .workspace { grid-template-columns: minmax(0, 1fr) 108px; gap: .5rem; }
+  .section-tabs { top: 82px; padding: .35rem; gap: .35rem; border-radius: 13px; }
+  .section-tab {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: .25rem;
+    padding: .65rem .25rem;
+    text-align: center;
+  }
+  .section-tab-icon { font-size: 1.05rem; }
+  .section-tab-label strong { font-size: .73rem; line-height: 1.1; }
+  .section-tab-label small { display: none; }
+  .measurement-grid { grid-template-columns: 1fr; }
+  .measurement-row { grid-template-columns: minmax(0, 1.15fr) minmax(92px, .85fr); }
+  .measurement-label { padding: .65rem .55rem; font-size: .86rem; }
+  .measurement-input { padding: .65rem .55rem; font-size: .92rem; }
+  .section-body { padding: .55rem; }
+}
+
+@media (max-width: 390px) {
+  .workspace { grid-template-columns: minmax(0, 1fr) 94px; }
+  .section-tab-label strong { font-size: .68rem; }
+  .measurement-row { grid-template-columns: 1fr; }
+  .measurement-input, .toggle-wrap, .choice-wrap, .split-inputs { border-left: 0; border-top: 1px solid var(--border); }
+}
