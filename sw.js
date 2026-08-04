@@ -1,4 +1,4 @@
-const CACHE = 'pre-tekmon-v7-set-point';
+const CACHE = 'pre-tekmon-v8-layout-tanks-time';
 const ASSETS = ['./', './index.html', './styles.css', './app.js', './manifest.webmanifest'];
 
 self.addEventListener('install', event => {

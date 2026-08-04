@@ -8,14 +8,23 @@ const sections = [
     title: 'Γενικές μετρήσεις',
     groups: [
       { title: '', fields: [
-        'A/C ηλεκτρολύτη', 'Δεξαμενές υδροχ/ΑΒ', 'Δεξαμενή Σόδας Α', 'Στρατσώνα', 'Ηλεκτροβάνα'
+        'A/C ηλεκτρολύτη',
+        'Δεξαμενές υδροχ/ΑΒ', 'Δεξαμενή υδροχλωρικού D902', 'Επιλογή γεμίσματος υδροχλωρικού',
+        'Δεξαμενή Σόδας Α', 'Δεξαμενή D904', 'Επιλογή γεμίσματος σόδας',
+        'Στρατσώνα', 'Ηλεκτροβάνα', 'Αλάτι', 'Θερμοδοχείο'
       ]}
+    ]
+  },
+  {
+    title: 'Στάθμες δεξαμενών',
+    groups: [
+      { title: '', fields: ['Ζ1', 'Ζ2', 'Ζ3', 'Δ1', 'Δ2', 'Δ3'] }
     ]
   },
   {
     title: 'Νερό ψυκτικού – Γλυκόλη',
     groups: [
-      { title: '', fields: ['Γλυκόλη Αντλ. 302', 'Γλυκόλη Αντλ. 303', 'Στάθμη δεξαμενής', 'Αλάτι', 'Θερμοδοχείο'] }
+      { title: '', fields: ['Γλυκόλη Αντλ. 302', 'Γλυκόλη Αντλ. 303', 'Στάθμη δεξαμενής'] }
     ]
   },
   {
@@ -32,7 +41,7 @@ const sections = [
     ]
   },
   {
-    title: 'Ψυκτικές μετρήσεις',
+    title: 'Ψυκτικά - Μετρήσεις',
     groups: [
       { title: 'Ψυκτικό Β', fields: ['Ψυκτικό Β', 'Set Point', 'Πίεση αντλίας', 'Διαφορική πίεση', 'Διαφορική γλυκόλης', 'Νερού θερμοκρασία (είσοδος/έξοδος)', 'Γλυκόλη θερμοκρασία (είσοδος/έξοδος)', 'Ψυκτικό μικρή/μεγάλη 1', 'Ψυκτικό μικρή/μεγάλη 2'] },
       { title: 'Ψυκτικό Α', fields: ['Ψυκτικό Α', 'Set Point', 'Πίεση αντλίας', 'Διαφορική πίεση', 'Διαφορική γλυκόλης', 'Νερού θερμοκρασία (είσοδος/έξοδος)', 'Γλυκόλη θερμοκρασία (είσοδος/έξοδος)', 'Ψυκτικό μικρή/μεγάλη 1', 'Ψυκτικό μικρή/μεγάλη 2'] },
@@ -76,6 +85,13 @@ const toggleFields = new Set([
 ]);
 
 const toggleWithValueFields = new Set(['Ηλεκτροβάνα']);
+
+const timeFields = new Set(['A/C ηλεκτρολύτη']);
+
+const choiceFields = new Map([
+  ['Επιλογή γεμίσματος υδροχλωρικού', ['Α', 'Β', 'D902']],
+  ['Επιλογή γεμίσματος σόδας', ['Α', 'D904']]
+]);
 
 function isSplitField(field) {
   return field.startsWith('Ψυκτικό μικρή/μεγάλη');
@@ -123,7 +139,26 @@ function renderForm() {
         const key = keyFor(section.title, group.title, field);
         const initial = defaults[field] || '';
 
-        if (toggleWithValueFields.has(field)) {
+        if (timeFields.has(field)) {
+          row.innerHTML = `<span class="measurement-label">${escapeHtml(field)}</span>
+            <input class="measurement-input" data-key="${escapeAttr(key)}" type="time" />`;
+        } else if (choiceFields.has(field)) {
+          const options = choiceFields.get(field);
+          row.classList.add('choice-row');
+          row.innerHTML = `<span class="measurement-label">${escapeHtml(field)}</span>
+            <div class="choice-wrap">
+              <input class="measurement-input choice-value" data-key="${escapeAttr(key)}" type="hidden" value="" />
+              ${options.map(option => `<button type="button" class="choice-btn" data-value="${escapeAttr(option)}">${escapeHtml(option)}</button>`).join('')}
+            </div>`;
+          const hidden = row.querySelector('.choice-value');
+          const buttons = row.querySelectorAll('.choice-btn');
+          const updateChoice = value => {
+            hidden.value = value;
+            buttons.forEach(button => button.classList.toggle('active', button.dataset.value === value));
+            scheduleDraftSave();
+          };
+          buttons.forEach(button => button.addEventListener('click', () => updateChoice(button.dataset.value)));
+        } else if (toggleWithValueFields.has(field)) {
           const valueKey = `${key}|||Τιμή`;
           row.classList.add('toggle-value-row');
           row.innerHTML = `<span class="measurement-label">${escapeHtml(field)}</span>
@@ -238,6 +273,12 @@ function applyState(state) {
       button.classList.toggle('active', button.dataset.value === hidden.value);
     });
   });
+  document.querySelectorAll('.choice-wrap').forEach(wrap => {
+    const hidden = wrap.querySelector('.choice-value');
+    wrap.querySelectorAll('.choice-btn').forEach(button => {
+      button.classList.toggle('active', button.dataset.value === hidden.value);
+    });
+  });
   editingId = state.editingId || state.id || null;
   document.getElementById('saveBtn').textContent = editingId ? 'Ενημέρωση' : 'Αποθήκευση';
   isRestoring = false;
@@ -245,18 +286,22 @@ function applyState(state) {
 }
 
 function restoreInitialState() {
+  let restored = false;
   let draft = null;
   try { draft = JSON.parse(localStorage.getItem(DRAFT_KEY)); } catch {}
-  if (draft && applyState(draft)) return;
+  if (draft && applyState(draft)) restored = true;
 
-  const entries = getEntries();
-  const lastId = localStorage.getItem(LAST_SAVED_KEY);
-  const latest = entries.find(entry => entry.id === lastId) || entries[0];
-  if (latest) {
-    applyState({ ...latest, editingId: latest.id });
-    saveDraftNow();
-    return;
+  if (!restored) {
+    const entries = getEntries();
+    const lastId = localStorage.getItem(LAST_SAVED_KEY);
+    const latest = entries.find(entry => entry.id === lastId) || entries[0];
+    if (latest) {
+      applyState({ ...latest, editingId: latest.id });
+      restored = true;
+    }
   }
+
+  // Σε κάθε νέο άνοιγμα, η κύρια ημερομηνία και ώρα γίνονται αυτόματα οι τρέχουσες.
   setNow();
   saveDraftNow();
 }
@@ -311,12 +356,10 @@ document.getElementById('clearBtn').addEventListener('click', () => {
   isRestoring = true;
   editingId = null;
 
-  // Καθαρίζει κάθε πεδίο της τρέχουσας φόρμας, μαζί με τα κρυφά ON/OFF.
-  form.querySelectorAll('input, textarea').forEach(field => {
-    if (field.type !== 'date' && field.type !== 'time') field.value = '';
-  });
+  // Καθαρίζει όλες τις μετρήσεις, μαζί με τα κρυφά ON/OFF και την ώρα ηλεκτρολύτη.
+  form.querySelectorAll('.measurement-input').forEach(field => { field.value = ''; });
 
-  document.querySelectorAll('.toggle-btn').forEach(button => button.classList.remove('active'));
+  document.querySelectorAll('.toggle-btn, .choice-btn').forEach(button => button.classList.remove('active'));
   operatorInput.value = '';
   notesInput.value = '';
 
