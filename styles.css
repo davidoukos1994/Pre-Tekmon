@@ -447,3 +447,26 @@ summary { cursor: pointer; color: var(--primary); font-weight: 700; }
 @media (max-width: 520px) {
   .multi-choice-wrap { grid-template-columns: 1fr 1fr; border-left: 0; border-top: 1px solid var(--border); }
 }
+
+
+/* v12: ώρα και τιμή ηλεκτρολύτη */
+.time-value-row { grid-template-columns: minmax(0, .9fr) minmax(220px, 1.1fr); }
+.time-value-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-left: 1px solid var(--border);
+  background: var(--bg);
+}
+.time-value-inputs label { gap: .15rem; padding: .35rem; }
+.time-value-inputs label + label { border-left: 1px solid var(--border); }
+.time-value-inputs small { text-align: center; color: var(--muted); font-weight: 750; }
+.time-value-inputs .measurement-input {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  min-height: 42px;
+  text-align: center;
+}
+@media (max-width: 520px) {
+  .time-value-row { grid-template-columns: 1fr; }
+  .time-value-inputs { border-left: 0; border-top: 1px solid var(--border); }
+}

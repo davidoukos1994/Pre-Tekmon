@@ -12,8 +12,6 @@ const sections = [
     groups: [
       { title: '', fields: [
         'A/C ηλεκτρολύτη',
-        'Δεξαμενές υδροχ/ΑΒ', 'Δεξαμενή υδροχλωρικού D902', 'Επιλογή γεμίσματος υδροχλωρικού',
-        'Δεξαμενή Σόδας Α', 'Δεξαμενή D904', 'Επιλογή γεμίσματος σόδας',
         'Αλάτι', 'Θερμοδοχείο'
       ]}
     ]
@@ -23,12 +21,12 @@ const sections = [
     category: 'general',
     title: 'Νερό ψυκτικού – Γλυκόλη',
     groups: [
-      { title: '', fields: ['Γλυκόλη Αντλ. 302', 'Γλυκόλη Αντλ. 303', 'Στάθμη δεξαμενής'] }
+      { title: '', fields: ['Γλυκόλη Αντλ. 302', 'Γλυκόλη Αντλ. 303'] }
     ]
   },
   {
     id: 'electric-boiler',
-    category: 'general',
+    category: 'boilers',
     title: 'Ηλεκτρικός ατμολέβητας',
     groups: [
       { title: '', fields: ['Πίεση PV', 'Βάνα ατμού', 'Εξωτερικός ατμός'] }
@@ -36,7 +34,7 @@ const sections = [
   },
   {
     id: 'oil-boiler',
-    category: 'general',
+    category: 'boilers',
     title: 'Λέβητας πετρελαίου / Λεβητοστάσιο',
     groups: [
       { title: 'Καύσιμο', fields: ['Δεξαμενή πετρελαίου', 'Μετρητής'] },
@@ -70,7 +68,9 @@ const sections = [
     category: 'tanks',
     title: 'Δεξαμενές χημικών',
     groups: [
-      { title: '', fields: ['Stabifluid δεξαμενή', 'Na₂CO₃ δεξαμενή', 'Αγωγιμότητα', 'pH'] }
+      { title: 'Δεξαμενές υδροχλωρικού', fields: ['Δεξαμενές υδροχ/ΑΒ', 'Δεξαμενή υδροχλωρικού D902', 'Επιλογή γεμίσματος υδροχλωρικού'] },
+      { title: 'Δεξαμενές σόδας', fields: ['Δεξαμενή Σόδας Α', 'Δεξαμενή D904', 'Επιλογή γεμίσματος σόδας'] },
+      { title: 'Λοιπές δεξαμενές χημικών', fields: ['Stabifluid δεξαμενή', 'Na₂CO₃ δεξαμενή', 'Στάθμη δεξαμενής', 'Αγωγιμότητα', 'pH'] }
     ]
   },
   {
@@ -102,6 +102,7 @@ const sections = [
 const categoryTabs = [
   { id: 'general', label: 'Γενικές', fullLabel: 'Γενικές Μετρήσεις', icon: '▣' },
   { id: 'equipment', label: 'Εξοπλισμός', fullLabel: 'Αντλίες / Ανεμιστήρες', icon: '⚙' },
+  { id: 'boilers', label: 'Λέβητες', fullLabel: 'Ηλεκτρικός & Πετρελαίου', icon: '♨' },
   { id: 'coolers', label: 'Ψυκτικά', fullLabel: 'Ψυκτικά Β + Α + C', icon: '❄' },
   { id: 'tanks', label: 'Δεξαμενές', fullLabel: 'Χημικά & Στάθμες', icon: '▥' },
   { id: 'ro', label: 'RO / UF', fullLabel: 'RO / UF', icon: '◉' },
@@ -136,7 +137,7 @@ const toggleFields = new Set([
 
 const toggleWithValueFields = new Set(['Ηλεκτροβάνα']);
 
-const timeFields = new Set(['A/C ηλεκτρολύτη']);
+const timeWithValueFields = new Set(['A/C ηλεκτρολύτη']);
 
 const choiceFields = new Map([
   ['Επιλογή γεμίσματος υδροχλωρικού', ['Α&Β', 'D-902']],
@@ -215,9 +216,15 @@ function renderForm() {
         const initial = defaults[field] || '';
         const shownLabel = labelFor(field);
 
-        if (timeFields.has(field)) {
+        if (timeWithValueFields.has(field)) {
+          const timeKey = `${key}|||Ώρα`;
+          const valueKey = `${key}|||Τιμή`;
+          row.classList.add('time-value-row');
           row.innerHTML = `<span class="measurement-label">${escapeHtml(shownLabel)}</span>
-            <input class="measurement-input" data-key="${escapeAttr(key)}" type="time" />`;
+            <div class="time-value-inputs">
+              <label><small>Ώρα μέτρησης</small><input class="measurement-input" data-key="${escapeAttr(timeKey)}" type="time" /></label>
+              <label><small>Τιμή</small><input class="measurement-input" data-key="${escapeAttr(valueKey)}" type="text" placeholder="Τιμή" /></label>
+            </div>`;
         } else if (multiChoiceFields.has(field)) {
           const options = multiChoiceFields.get(field);
           row.classList.add('choice-row');

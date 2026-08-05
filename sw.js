@@ -1,4 +1,4 @@
-const CACHE = 'pre-tekmon-v11';
+const CACHE = 'pre-tekmon-v12';
 const ASSETS = ['./', './index.html', './styles.css', './app.js', './manifest.webmanifest'];
 
 self.addEventListener('install', event => {
