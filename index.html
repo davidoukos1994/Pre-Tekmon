@@ -32,9 +32,9 @@
       </div>
     </section>
 
-    <nav class="tabs" aria-label="Κύρια πλοήγηση">
-      <button class="tab active" data-view="formView" type="button">Καταχώρηση</button>
-      <button class="tab" data-view="historyView" type="button">Ιστορικό <span id="historyCount" class="badge">0</span></button>
+    <nav class="tabs single-tab" aria-label="Κύρια πλοήγηση">
+      <button class="tab active" data-view="formView" type="button">Μετρήσεις</button>
+      <span id="historyCount" class="badge" hidden>0</span>
     </nav>
 
     <section id="formView" class="view active">
@@ -44,21 +44,21 @@
             <div id="sectionsRoot"></div>
 
             <section id="notesPanel" class="card notes-card">
-          <h2>Σημειώσεις</h2>
+          <h2>Παρατηρήσεις</h2>
           <textarea id="notes" rows="5" placeholder="Παρατηρήσεις, βλάβες, ενέργειες..."></textarea>
             </section>
           </div>
           <nav id="sectionTabs" class="section-tabs" aria-label="Καρτέλες μετρήσεων"></nav>
         </div>
 
-        <div class="sticky-actions">
-          <button id="clearBtn" class="btn secondary" type="button">Καθαρισμός</button>
-          <button id="saveBtn" class="btn primary" type="submit">Αποθήκευση</button>
+        <div class="sticky-actions end-actions">
+          <button id="clearBtn" class="btn danger" type="button">Καθαρισμός όλων</button>
+          <button id="saveBtn" type="submit" hidden>Αποθήκευση</button>
         </div>
       </form>
     </section>
 
-    <section id="historyView" class="view">
+    <section id="historyView" class="view" hidden>
       <section class="card history-tools">
         <input id="historySearch" type="search" placeholder="Αναζήτηση ημερομηνίας, ώρας ή σημείωσης..." />
         <div class="tool-row">

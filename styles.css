@@ -411,3 +411,39 @@ summary { cursor: pointer; color: var(--primary); font-weight: 700; }
   .measurement-row { grid-template-columns: 1fr; }
   .measurement-input, .toggle-wrap, .choice-wrap, .split-inputs { border-left: 0; border-top: 1px solid var(--border); }
 }
+
+/* v11 διορθώσεις εξοπλισμού και καθαρισμού */
+.single-tab { display: none; }
+.end-actions {
+  position: static !important;
+  margin-top: 1rem;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+.end-actions .btn { width: 100%; }
+.multi-choice-wrap {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .55rem;
+  width: 100%;
+  padding: .55rem;
+  border-left: 1px solid var(--border);
+  background: var(--bg);
+}
+.multi-check {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  min-height: 50px;
+  padding: .65rem .75rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--card);
+  font-weight: 800;
+}
+.multi-check input { width: 22px; height: 22px; accent-color: var(--primary); }
+@media (max-width: 520px) {
+  .multi-choice-wrap { grid-template-columns: 1fr 1fr; border-left: 0; border-top: 1px solid var(--border); }
+}

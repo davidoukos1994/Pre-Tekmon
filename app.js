@@ -14,7 +14,7 @@ const sections = [
         'A/C ηλεκτρολύτη',
         'Δεξαμενές υδροχ/ΑΒ', 'Δεξαμενή υδροχλωρικού D902', 'Επιλογή γεμίσματος υδροχλωρικού',
         'Δεξαμενή Σόδας Α', 'Δεξαμενή D904', 'Επιλογή γεμίσματος σόδας',
-        'Στρατσώνα', 'Ηλεκτροβάνα', 'Αλάτι', 'Θερμοδοχείο'
+        'Αλάτι', 'Θερμοδοχείο'
       ]}
     ]
   },
@@ -44,21 +44,25 @@ const sections = [
     ]
   },
   {
+    id: 'equipment',
+    category: 'equipment',
+    title: 'Αντλίες – Ανεμιστήρες – Πίεση / Στάθμη',
+    groups: [
+      { title: 'Αντλίες CP-301', fields: ['Αντλίες CP-301'] },
+      { title: 'Ανεμιστήρες CT-301', fields: ['Ανεμιστήρες CT-301'] },
+      { title: 'Πίεση καταθλίψεως / Στάθμη', fields: ['Πίεση καταθλίψεως', 'Στάθμη OK / NOT OK'] },
+      { title: 'Ηλεκτροβάνα', fields: ['Ηλεκτροβάνα'] },
+      { title: 'Στρατσώνα', fields: ['Στρατσώνα'] }
+    ]
+  },
+  {
     id: 'coolers',
     category: 'coolers',
     title: 'Ψυκτικά - Μετρήσεις',
     groups: [
-      { title: 'Ψυκτικό Α', fields: ['Ψυκτικό Α', 'Set Point', 'Πίεση αντλίας μικρή', 'Πίεση αντλίας μεγάλη', 'Διαφορική πίεση', 'Διαφορική γλυκόλης', 'Θερμοκρασία νερού είσοδος', 'Θερμοκρασία νερού έξοδος', 'Θερμοκρασία γλυκόλης είσοδος', 'Θερμοκρασία γλυκόλης έξοδος', 'Ψυκτικό μικρή/μεγάλη'] },
-      { title: 'Ψυκτικό Β', fields: ['Ψυκτικό Β', 'Set Point', 'Πίεση αντλίας μικρή', 'Πίεση αντλίας μεγάλη', 'Διαφορική πίεση', 'Διαφορική γλυκόλης', 'Θερμοκρασία νερού είσοδος', 'Θερμοκρασία νερού έξοδος', 'Θερμοκρασία γλυκόλης είσοδος', 'Θερμοκρασία γλυκόλης έξοδος', 'Ψυκτικό μικρή/μεγάλη'] },
-      { title: 'Ψυκτικό C', fields: ['Ψυκτικό C', 'Set Point', 'Capacity', 'Πίεση αντλίας μικρή', 'Πίεση αντλίας μεγάλη', 'Διαφορική πίεση', 'Διαφορική γλυκόλης', 'Θερμοκρασία νερού είσοδος', 'Θερμοκρασία νερού έξοδος', 'Θερμοκρασία γλυκόλης είσοδος', 'Θερμοκρασία γλυκόλης έξοδος', 'Ψυκτικό μικρή/μεγάλη'] }
-    ]
-  },
-  {
-    id: 'tank-levels',
-    category: 'tanks',
-    title: 'Στάθμες δεξαμενών',
-    groups: [
-      { title: '', fields: ['Ζ1', 'Ζ2', 'Ζ3', 'Δ1', 'Δ2', 'Δ3'] }
+      { title: 'Ψυκτικό Β', fields: ['Ψυκτικό Β', 'Set Point', 'Πίεση αντλίας', 'Διαφορική πίεση', 'Διαφορική γλυκόλης', 'Θερμοκρασία ΠΨ είσοδος', 'Θερμοκρασία ΠΨ έξοδος', 'Θερμοκρασία γλυκόλης είσοδος', 'Θερμοκρασία γλυκόλης έξοδος', 'Κύκλωμα Α μικρή/μεγάλη', 'Κύκλωμα Β μικρή/μεγάλη'] },
+      { title: 'Ψυκτικό Α', fields: ['Ψυκτικό Α', 'Set Point', 'Πίεση αντλίας', 'Διαφορική πίεση', 'Διαφορική γλυκόλης', 'Θερμοκρασία ΠΨ είσοδος', 'Θερμοκρασία ΠΨ έξοδος', 'Θερμοκρασία γλυκόλης είσοδος', 'Θερμοκρασία γλυκόλης έξοδος', 'Κύκλωμα Α μικρή/μεγάλη', 'Κύκλωμα Β μικρή/μεγάλη'] },
+      { title: 'Ψυκτικό C', fields: ['Ψυκτικό C', 'Set Point', 'Capacity', 'Πίεση αντλίας', 'Διαφορική πίεση', 'Διαφορική γλυκόλης', 'Θερμοκρασία ΠΨ είσοδος', 'Θερμοκρασία ΠΨ έξοδος', 'Θερμοκρασία γλυκόλης είσοδος', 'Θερμοκρασία γλυκόλης έξοδος', 'Κύκλωμα Α μικρή/μεγάλη', 'Κύκλωμα Β μικρή/μεγάλη'] }
     ]
   },
   {
@@ -67,6 +71,14 @@ const sections = [
     title: 'Δεξαμενές χημικών',
     groups: [
       { title: '', fields: ['Stabifluid δεξαμενή', 'Na₂CO₃ δεξαμενή', 'Αγωγιμότητα', 'pH'] }
+    ]
+  },
+  {
+    id: 'tank-levels',
+    category: 'tanks',
+    title: 'Στάθμες δεξαμενών',
+    groups: [
+      { title: '', fields: ['Ζ1', 'Ζ2', 'Ζ3', 'Δ1', 'Δ2', 'Δ3'] }
     ]
   },
   {
@@ -89,10 +101,11 @@ const sections = [
 
 const categoryTabs = [
   { id: 'general', label: 'Γενικές', fullLabel: 'Γενικές Μετρήσεις', icon: '▣' },
-  { id: 'coolers', label: 'Ψυκτικά', fullLabel: 'Ψυκτικά Α + Β + C', icon: '❄' },
-  { id: 'tanks', label: 'Δεξαμενές', fullLabel: 'Στάθμες Δεξαμενών', icon: '▥' },
+  { id: 'equipment', label: 'Εξοπλισμός', fullLabel: 'Αντλίες / Ανεμιστήρες', icon: '⚙' },
+  { id: 'coolers', label: 'Ψυκτικά', fullLabel: 'Ψυκτικά Β + Α + C', icon: '❄' },
+  { id: 'tanks', label: 'Δεξαμενές', fullLabel: 'Χημικά & Στάθμες', icon: '▥' },
   { id: 'ro', label: 'RO / UF', fullLabel: 'RO / UF', icon: '◉' },
-  { id: 'notes', label: 'Αποθήκευση', fullLabel: 'Παρατηρήσεις & Αποθήκευση', icon: '✎' }
+  { id: 'notes', label: 'Καθαρισμός', fullLabel: 'Παρατηρήσεις & Καθαρισμός', icon: '✎' }
 ];
 
 const displayLabels = new Map([
@@ -130,8 +143,17 @@ const choiceFields = new Map([
   ['Επιλογή γεμίσματος σόδας', ['Α', 'D-904']]
 ]);
 
+const multiChoiceFields = new Map([
+  ['Αντλίες CP-301', ['A', 'B', 'C']],
+  ['Ανεμιστήρες CT-301', ['A', 'B', 'C', 'D']]
+]);
+
+const statusChoiceFields = new Map([
+  ['Στάθμη OK / NOT OK', ['OK', 'NOT OK']]
+]);
+
 function isSplitField(field) {
-  return field.startsWith('Ψυκτικό μικρή/μεγάλη');
+  return field.includes('μικρή/μεγάλη');
 }
 
 function splitKey(section, group, field, side) {
@@ -196,6 +218,29 @@ function renderForm() {
         if (timeFields.has(field)) {
           row.innerHTML = `<span class="measurement-label">${escapeHtml(shownLabel)}</span>
             <input class="measurement-input" data-key="${escapeAttr(key)}" type="time" />`;
+        } else if (multiChoiceFields.has(field)) {
+          const options = multiChoiceFields.get(field);
+          row.classList.add('choice-row');
+          row.innerHTML = `<span class="measurement-label">${escapeHtml(shownLabel)}</span>
+            <div class="multi-choice-wrap">
+              ${options.map(option => `<label class="multi-check"><input class="measurement-input multi-choice-input" data-key="${escapeAttr(`${key}|||${option}`)}" type="checkbox" value="${escapeAttr(option)}" /><span>${escapeHtml(option)}</span></label>`).join('')}
+            </div>`;
+        } else if (statusChoiceFields.has(field)) {
+          const options = statusChoiceFields.get(field);
+          row.classList.add('choice-row');
+          row.innerHTML = `<span class="measurement-label">${escapeHtml(shownLabel)}</span>
+            <div class="choice-wrap">
+              <input class="measurement-input choice-value" data-key="${escapeAttr(key)}" type="hidden" value="" />
+              ${options.map(option => `<button type="button" class="choice-btn" data-value="${escapeAttr(option)}">${escapeHtml(option)}</button>`).join('')}
+            </div>`;
+          const hidden = row.querySelector('.choice-value');
+          const buttons = row.querySelectorAll('.choice-btn');
+          const updateChoice = value => {
+            hidden.value = value;
+            buttons.forEach(button => button.classList.toggle('active', button.dataset.value === value));
+            scheduleDraftSave();
+          };
+          buttons.forEach(button => button.addEventListener('click', () => updateChoice(button.dataset.value)));
         } else if (choiceFields.has(field)) {
           const options = choiceFields.get(field);
           row.classList.add('choice-row');
@@ -308,7 +353,7 @@ function setEntries(entries) { localStorage.setItem(STORAGE_KEY, JSON.stringify(
 function currentFormState() {
   const values = {};
   document.querySelectorAll('.measurement-input').forEach(input => {
-    values[input.dataset.key] = input.value;
+    values[input.dataset.key] = input.type === 'checkbox' ? (input.checked ? input.value : '') : input.value;
   });
   return {
     editingId,
@@ -341,7 +386,7 @@ function applyState(state) {
   operatorInput.value = state.operator || '';
   notesInput.value = state.notes || '';
   document.querySelectorAll('.measurement-input').forEach(input => {
-    input.value = state.values[input.dataset.key] ?? '';
+    if (input.type === 'checkbox') input.checked = (state.values[input.dataset.key] ?? '') === input.value; else input.value = state.values[input.dataset.key] ?? '';
   });
   document.querySelectorAll('.toggle-wrap').forEach(wrap => {
     const hidden = wrap.querySelector('.toggle-value');
@@ -356,7 +401,7 @@ function applyState(state) {
     });
   });
   editingId = state.editingId || state.id || null;
-  document.getElementById('saveBtn').textContent = editingId ? 'Ενημέρωση' : 'Αποθήκευση';
+  const saveBtn = document.getElementById('saveBtn'); if (saveBtn) saveBtn.textContent = editingId ? 'Ενημέρωση' : 'Αποθήκευση';
   isRestoring = false;
   return true;
 }
@@ -397,7 +442,7 @@ function bindDraftAutosave() {
 
 function collectData() {
   const values = {};
-  document.querySelectorAll('.measurement-input').forEach(input => { values[input.dataset.key] = input.value.trim(); });
+  document.querySelectorAll('.measurement-input').forEach(input => { values[input.dataset.key] = input.type === 'checkbox' ? (input.checked ? input.value : '') : input.value.trim(); });
   return {
     id: editingId || (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`),
     date: dateInput.value,
@@ -419,7 +464,7 @@ form.addEventListener('submit', event => {
   setEntries(entries);
   editingId = entry.id;
   localStorage.setItem(LAST_SAVED_KEY, entry.id);
-  document.getElementById('saveBtn').textContent = 'Ενημέρωση';
+  const saveBtn = document.getElementById('saveBtn'); if (saveBtn) saveBtn.textContent = 'Ενημέρωση';
   saveDraftNow();
   renderHistory();
   showToast(index >= 0 ? 'Η καταχώρηση ενημερώθηκε και θα ανοίγει αυτόματα.' : 'Η καταχώρηση αποθηκεύτηκε και θα ανοίγει αυτόματα.');
@@ -433,7 +478,7 @@ document.getElementById('clearBtn').addEventListener('click', () => {
   editingId = null;
 
   // Καθαρίζει όλες τις μετρήσεις, μαζί με τα κρυφά ON/OFF και την ώρα ηλεκτρολύτη.
-  form.querySelectorAll('.measurement-input').forEach(field => { field.value = ''; });
+  form.querySelectorAll('.measurement-input').forEach(field => { if (field.type === 'checkbox') field.checked = false; else field.value = ''; });
 
   document.querySelectorAll('.toggle-btn, .choice-btn').forEach(button => button.classList.remove('active'));
   operatorInput.value = '';
@@ -441,7 +486,7 @@ document.getElementById('clearBtn').addEventListener('click', () => {
 
   // Η ημερομηνία και η ώρα παραμένουν χρήσιμες και επανέρχονται στην τρέχουσα στιγμή.
   setNow();
-  document.getElementById('saveBtn').textContent = 'Αποθήκευση';
+  const saveBtn = document.getElementById('saveBtn'); if (saveBtn) saveBtn.textContent = 'Αποθήκευση';
 
   // Αφαιρεί την προηγούμενη πρόχειρη/τελευταία κατάσταση και γράφει αμέσως την καθαρή φόρμα.
   localStorage.removeItem(DRAFT_KEY);
